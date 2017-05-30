@@ -48,6 +48,11 @@ app.get('/:Time', function(req, res){
                            'natural': getISOTime(url_time) }))
 })
 
+app.get('*',function(req, res){
+  res.writeHead(404, {'Content-Type' : 'text/plain'})
+  res.end('404 error! this api doesn\'t support this operation.')
+})
+
 app.listen(8080, function () {
   console.log('Example app listening on port 8080!')
 })
