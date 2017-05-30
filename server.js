@@ -1,6 +1,18 @@
 const express = require('express')
 const app = express()
-var url = require('url')
+
+function getISOTime(time){
+  var ISOTime = new Date(time)
+  if(isNaN(ISOTime.getTime())) return null
+  var fullMonthName = ['January','February','March','April','May','June','July','August','September','October','November','December']
+  return fullMonthName[ISOTime.getMonth()].concat(' ', ISOTime.getDate(), ', ', ISOTime.getFullYear())
+}
+
+function getUNIXTime(time){
+  var UNIXtime = new Date(time)
+  if(isNaN(UNIXtime.getTime())) return null
+  return UNIXtime.getTime()/1000;
+}
 
 app.get('/', function(req, res, next){
   res.writeHead(200, {'Content-Type': 'text/plain'});
@@ -21,13 +33,20 @@ app.get('/', function(req, res, next){
 })
 
 app.get('/:Time', function(req, res){
-  res.end('Hello World!');
+  var checkNumberOnly = Number(req.params.Time);
+  var url_time;
+  if(isNaN(checkNumberOnly)){
+    url_time = req.params.Time.toString().replace('%20',' ')
+    url_time = new Date(url_time);
+  }
+  else{
+   url_time = new Date(+req.params.Time)
+   url_time = url_time.getTime()*1000; // convert s to ms
+  }
+  res.writeHead(200, {'Content-Type' : 'application/json'})
+  res.end(JSON.stringify({ 'unix': getUNIXTime(url_time),
+                           'natural': getISOTime(url_time) }))
 })
-
-/*app.get('/:Time', function (req, res) {
-  var time = req.params.Time;
-  res.send('Hello World!')
-})*/
 
 app.listen(8080, function () {
   console.log('Example app listening on port 8080!')
